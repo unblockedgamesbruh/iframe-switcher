@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="theme-color"
+        content="#111111">
+
+    <meta
+        name="description"
+        content="A full-screen resource switcher for accessing web resources in one place.">
+
+    <link
+        rel="manifest"
+        href="manifest.json">
+
+    <title>Resource Switcher</title>
+
+
+    <!-- =========================================================
+         STYLE 1 — PAGE / FULL-SCREEN IFRAME
+         ========================================================= -->
+
+    <style>
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+
+            margin: 0;
+            padding: 0;
+
+            overflow: hidden;
+
+            background: #111111;
+        }
+
+
+        .switch-target {
+            position: fixed;
+
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            margin: 0;
+            padding: 0;
+
+            border: 0;
+
+            background: #111111;
+        }
+
+    </style>
+
+
+    <!-- =========================================================
+         STYLE 2 — MENU / RESOURCE CHOOSER
+         ========================================================= -->
+
+    <style>
+
+        /* =====================================================
+           MENU BUTTON
+           ===================================================== */
+
+        .menu-button {
+            position: fixed;
+
+            top: 18px;
+            left: 18px;
+
+            z-index: 2000;
+
+            width: 46px;
+            height: 46px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+
+            border: 0;
+            border-radius: 12px;
+
+            background: rgba(20, 20, 20, 0.88);
+
+            color: #ffffff;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 30px;
+            font-weight: normal;
+
+            line-height: 1;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 4px 18px rgba(0, 0, 0, 0.35);
+
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+
+        .menu-button:hover {
+            background: rgba(45, 45, 45, 0.96);
+
+            transform: scale(1.05);
+
+            box-shadow:
+                0 6px 24px rgba(0, 0, 0, 0.45);
+        }
+
+
+        .menu-button:active {
+            transform: scale(0.96);
+        }
+
+
+        /* =====================================================
+           MENU PANEL
+           ===================================================== */
+
+        .switcher-container {
+            position: fixed;
+
+            top: 18px;
+            left: 76px;
+
+            z-index: 1999;
+
+            width: 310px;
+
+            max-width:
+                calc(100vw - 94px);
+
+            box-sizing: border-box;
+
+            padding: 8px;
+
+            background:
+                rgba(24, 24, 24, 0.96);
+
+            border:
+                1px solid rgba(255, 255, 255, 0.10);
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 12px 40px rgba(0, 0, 0, 0.45);
+
+            -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+
+            opacity: 0;
+
+            visibility: hidden;
+
+            transform:
+                translateX(-10px)
+                scale(0.97);
+
+            transform-origin:
+                top left;
+
+            transition:
+                opacity 0.18s ease,
+                transform 0.18s ease,
+                visibility 0.18s ease;
+        }
+
+
+        .switcher-container.open {
+            opacity: 1;
+
+            visibility: visible;
+
+            transform:
+                translateX(0)
+                scale(1);
+        }
+
+
+        /* =====================================================
+           MENU HEADER
+           ===================================================== */
+
+        .menu-header {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            padding:
+                10px
+                10px
+                8px
+                12px;
+
+            color:
+                rgba(255, 255, 255, 0.60);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.08em;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =====================================================
+           RESOURCE LIST
+           ===================================================== */
+
+        .resource-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 3px;
+
+            max-height:
+                calc(100vh - 100px);
+
+            overflow-y: auto;
+
+            -webkit-overflow-scrolling: touch;
+
+            scrollbar-width: thin;
+
+            scrollbar-color:
+                rgba(255, 255, 255, 0.25)
+                transparent;
+        }
+
+
+        .resource-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+
+        .resource-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+
+        .resource-list::-webkit-scrollbar-thumb {
+            background:
+                rgba(255, 255, 255, 0.25);
+
+            border-radius: 10px;
+        }
+
+
+        /* =====================================================
+           RESOURCE BUTTONS
+           ===================================================== */
+
+        .resource-button {
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            box-sizing: border-box;
+
+            padding:
+                11px
+                12px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            background: transparent;
+
+            color:
+                rgba(255, 255, 255, 0.82);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            line-height: 1.3;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            -webkit-tap-highlight-color:
+                transparent;
+
+            transition:
+                background 0.15s ease,
+                color 0.15s ease;
+        }
+
+
+        .resource-button:hover {
+            background:
+                rgba(255, 255, 255, 0.09);
+
+            color: #ffffff;
+        }
+
+
+        .resource-button:active {
+            background:
+                rgba(255, 255, 255, 0.16);
+        }
+
+
+        .resource-button.active {
+            background:
+                rgba(255, 255, 255, 0.14);
+
+            color: #ffffff;
+        }
+
+
+        /* =====================================================
+           ACTIVE RESOURCE INDICATOR
+           ===================================================== */
+
+        .resource-button::before {
+            content: "";
+
+            width: 5px;
+            height: 5px;
+
+            flex:
+                0 0 5px;
+
+            margin-right: 10px;
+
+            border-radius: 50%;
+
+            background: transparent;
+        }
+
+
+        .resource-button.active::before {
+            background: #4da3ff;
+
+            box-shadow:
+                0 0 8px
+                rgba(77, 163, 255, 0.80);
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .menu-button {
+                top: 12px;
+                left: 12px;
+            }
+
+
+            .switcher-container {
+                top: 68px;
+                left: 12px;
+
+                width:
+                    calc(100vw - 24px);
+
+                max-width: none;
+
+                transform-origin:
+                    top left;
+            }
+
+
+            .resource-button {
+                padding:
+                    13px
+                    12px;
+
+                font-size: 15px;
+            }
+
+        }
+
+
+        /* =====================================================
+           VERY SMALL SCREENS
+           ===================================================== */
+
+        @media (max-width: 360px) {
+
+            .menu-button {
+                width: 42px;
+                height: 42px;
+
+                top: 10px;
+                left: 10px;
+
+                font-size: 27px;
+            }
+
+
+            .switcher-container {
+                top: 62px;
+                left: 10px;
+
+                width:
+                    calc(100vw - 20px);
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================================
+         MENU BUTTON
+         ========================================================= -->
+
+    <button
+        class="menu-button"
+        id="menuButton"
+        type="button"
+        aria-label="Open resource menu"
+        aria-expanded="false">
+
+        ≡
+
+    </button>
+
+
+    <!-- =========================================================
+         RESOURCE MENU
+         ========================================================= -->
+
+    <div
+        class="switcher-container"
+        id="switcherContainer">
+
+
+        <div class="menu-header">
+
+            <span>
+                Resources
+            </span>
+
+        </div>
+
+
+        <div
+            class="resource-list"
+            id="resourceList">
+
+
+            <button
+                class="resource-button active"
+                type="button"
+                data-url="https://somelink.com/">
+
+                Something
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/BPVk7m">
+
+                Else
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/fnvCqW">
+
+                Workflows
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/0A86G1">
+
+                Another Resource
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/mYLons">
+
+                Another
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/EjW6fI">
+
+                Yep, another
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/DFTv72">
+
+                And this one
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/MK5rOa">
+
+                yes and again
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://goo.gl/YXdIWs">
+
+                next to last resource
+
+            </button>
+
+
+            <button
+                class="resource-button"
+                type="button"
+                data-url="https://www.justinfarrow.com/ning">
+
+                JFarrow helps with Ning sites
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         FULL-SCREEN IFRAME
+         ========================================================= -->
+
+    <iframe
+        class="switch-target"
+        id="switchTarget"
+        title="Selected Resource"
+        allowfullscreen>
+    </iframe>
+
+
+    <!-- =========================================================
+         SCRIPT 1 — LEGACY COMPATIBILITY
+         ========================================================= -->
+
+    <script>
+
+        (function () {
+
+            /*
+             * Small compatibility helpers for older browsers.
+             */
+
+
+            /* -----------------------------------------------------
+               Element.matches
+               ----------------------------------------------------- */
+
+            if (!Element.prototype.matches) {
+
+                Element.prototype.matches =
+                    Element.prototype.msMatchesSelector ||
+                    Element.prototype.webkitMatchesSelector ||
+                    function (selector) {
+
+                        var matches =
+                            (
+                                this.document ||
+                                this.ownerDocument
+                            ).querySelectorAll(
+                                selector
+                            );
+
+
+                        var index =
+                            matches.length;
+
+
+                        while (--index >= 0) {
+
+                            if (
+                                matches[index] ===
+                                this
+                            ) {
+
+                                return true;
+
+                            }
+
+                        }
+
+
+                        return false;
+
+                    };
+
+            }
+
+
+            /* -----------------------------------------------------
+               Element.closest
+               ----------------------------------------------------- */
+
+            if (!Element.prototype.closest) {
+
+                Element.prototype.closest =
+                    function (selector) {
+
+                        var element = this;
+
+
+                        while (element) {
+
+                            if (
+                                element.matches &&
+                                element.matches(
+                                    selector
+                                )
+                            ) {
+
+                                return element;
+
+                            }
+
+
+                            element =
+                                element.parentElement;
+
+                        }
+
+
+                        return null;
+
+                    };
+
+            }
+
+
+            /* -----------------------------------------------------
+               NodeList.forEach
+               ----------------------------------------------------- */
+
+            if (
+                window.NodeList &&
+                !NodeList.prototype.forEach
+            ) {
+
+                NodeList.prototype.forEach =
+                    Array.prototype.forEach;
+
+            }
+
+
+            /* -----------------------------------------------------
+               requestAnimationFrame
+               ----------------------------------------------------- */
+
+            window.requestAnimationFrame =
+                window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+
+                    return window.setTimeout(
+                        callback,
+                        16
+                    );
+
+                };
+
+
+            /* -----------------------------------------------------
+               Console fallback
+               ----------------------------------------------------- */
+
+            if (!window.console) {
+
+                window.console = {
+
+                    log: function () {},
+
+                    warn: function () {},
+
+                    error: function () {}
+
+                };
+
+            }
+
+        }());
+
+    </script>
+
+
+    <!-- =========================================================
+         SCRIPT 2 — MAIN APPLICATION
+         ========================================================= -->
+
+    <script>
+
+        (function () {
+
+            var menuButton =
+                document.getElementById(
+                    "menuButton"
+                );
+
+
+            var menu =
+                document.getElementById(
+                    "switcherContainer"
+                );
+
+
+            var iframe =
+                document.getElementById(
+                    "switchTarget"
+                );
+
+
+            var resourceButtons =
+                document.querySelectorAll(
+                    ".resource-button"
+                );
+
+
+            /* =====================================================
+               GET RESOURCE URL
+               ===================================================== */
+
+            function getUrl(button) {
+
+                return button.getAttribute(
+                    "data-url"
+                );
+
+            }
+
+
+            /* =====================================================
+               CLOSE MENU
+               ===================================================== */
+
+            function closeMenu() {
+
+                menu.classList.remove(
+                    "open"
+                );
+
+
+                menuButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
+
+
+            /* =====================================================
+               OPEN / CLOSE MENU
+               ===================================================== */
+
+            menuButton.onclick =
+                function () {
+
+                    var isOpen =
+                        menu.classList.contains(
+                            "open"
+                        );
+
+
+                    if (isOpen) {
+
+                        closeMenu();
+
+                    } else {
+
+                        menu.classList.add(
+                            "open"
+                        );
+
+
+                        menuButton.setAttribute(
+                            "aria-expanded",
+                            "true"
+                        );
+
+                    }
+
+                };
+
+
+            /* =====================================================
+               RESOURCE SELECTION
+               ===================================================== */
+
+            for (
+                var i = 0;
+                i < resourceButtons.length;
+                i++
+            ) {
+
+                (function (button) {
+
+                    button.onclick =
+                        function () {
+
+                            var url =
+                                getUrl(
+                                    button
+                                );
+
+
+                            /*
+                             * Load selected page.
+                             */
+
+                            iframe.src =
+                                url;
+
+
+                            /*
+                             * Remove active
+                             * state from all
+                             * resources.
+                             */
+
+                            for (
+                                var j = 0;
+                                j <
+                                resourceButtons.length;
+                                j++
+                            ) {
+
+                                resourceButtons[j]
+                                    .classList
+                                    .remove(
+                                        "active"
+                                    );
+
+                            }
+
+
+                            /*
+                             * Mark selected
+                             * resource.
+                             */
+
+                            button.classList.add(
+                                "active"
+                            );
+
+
+                            /*
+                             * Close menu.
+                             */
+
+                            closeMenu();
+
+                        };
+
+                }(
+                    resourceButtons[i]
+                ));
+
+            }
+
+
+            /* =====================================================
+               LOAD FIRST RESOURCE
+               ===================================================== */
+
+            if (
+                resourceButtons.length >
+                0
+            ) {
+
+                iframe.src =
+                    getUrl(
+                        resourceButtons[0]
+                    );
+
+            }
+
+
+            /* =====================================================
+               CLICK OUTSIDE MENU
+               ===================================================== */
+
+            document.onclick =
+                function (event) {
+
+                    event =
+                        event ||
+                        window.event;
+
+
+                    var target =
+                        event.target ||
+                        event.srcElement;
+
+
+                    if (
+                        !menu.contains(
+                            target
+                        ) &&
+                        !menuButton.contains(
+                            target
+                        )
+                    ) {
+
+                        closeMenu();
+
+                    }
+
+                };
+
+
+            /* =====================================================
+               ESCAPE KEY
+               ===================================================== */
+
+            document.onkeydown =
+                function (event) {
+
+                    event =
+                        event ||
+                        window.event;
+
+
+                    var key =
+                        event.key ||
+                        event.keyCode;
+
+
+                    if (
+                        key === "Escape" ||
+                        key === 27
+                    ) {
+
+                        closeMenu();
+
+                    }
+
+                };
+
+        }());
+
+    </script>
+
+
+</body>
+
+</html>
