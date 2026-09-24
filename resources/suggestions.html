@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="theme-color"
+        content="#111111">
+
+    <meta
+        name="description"
+        content="Suggestions and alternate ways to access the Resource Switcher.">
+
+    <title>Suggestions</title>
+
+
+    <style>
+
+        html {
+            background: #111111;
+        }
+
+
+        body {
+            margin: 0;
+            padding: 0;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-sizing: border-box;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #202020 0%,
+                    #111111 55%
+                );
+
+            color: #e8e8e8;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            line-height: 1.6;
+        }
+
+
+        .card {
+            width: 100%;
+            max-width: 620px;
+
+            box-sizing: border-box;
+
+            margin: 24px;
+            padding: 42px;
+
+            background:
+                rgba(255, 255, 255, 0.055);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.10);
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.35);
+
+            -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+        }
+
+
+        .icon {
+            width: 54px;
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 24px;
+
+            border-radius: 14px;
+
+            background: #4da3ff;
+
+            color: #07111d;
+
+            font-size: 32px;
+            font-weight: 700;
+
+            box-shadow:
+                0 8px 25px
+                rgba(77, 163, 255, 0.25);
+        }
+
+
+        .eyebrow {
+            margin-bottom: 10px;
+
+            color: #4da3ff;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            letter-spacing: 0.12em;
+
+            text-transform: uppercase;
+        }
+
+
+        h1 {
+            margin:
+                0
+                0
+                16px;
+
+            color: #ffffff;
+
+            font-size:
+                clamp(
+                    30px,
+                    6vw,
+                    44px
+                );
+
+            line-height: 1.1;
+        }
+
+
+        p {
+            margin:
+                0
+                0
+                18px;
+
+            color:
+                rgba(255, 255, 255, 0.68);
+
+            font-size: 17px;
+        }
+
+
+        .suggestion {
+            margin:
+                30px
+                0;
+
+            padding: 22px;
+
+            background:
+                rgba(77, 163, 255, 0.08);
+
+            border:
+                1px solid
+                rgba(77, 163, 255, 0.20);
+
+            border-radius: 12px;
+        }
+
+
+        .suggestion strong {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #ffffff;
+
+            font-size: 16px;
+        }
+
+
+        .button {
+            display: inline-block;
+
+            margin-top: 8px;
+
+            padding:
+                12px
+                18px;
+
+            border-radius: 9px;
+
+            background: #4da3ff;
+
+            color: #07111d;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            text-decoration: none;
+
+            transition:
+                background 0.15s ease,
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+
+        .button:hover {
+            background: #69b5ff;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 6px 20px
+                rgba(77, 163, 255, 0.25);
+        }
+
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+
+        .url {
+            display: block;
+
+            margin-top: 14px;
+
+            padding: 12px;
+
+            overflow-x: auto;
+
+            background:
+                rgba(0, 0, 0, 0.25);
+
+            border-radius: 8px;
+
+            color:
+                rgba(255, 255, 255, 0.55);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            font-size: 12px;
+        }
+
+
+        .note {
+            margin-top: 28px;
+
+            color:
+                rgba(255, 255, 255, 0.45);
+
+            font-size: 13px;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .card {
+                margin: 16px;
+
+                padding: 30px 22px;
+
+                border-radius: 14px;
+            }
+
+
+            p {
+                font-size: 16px;
+            }
+
+
+            .button {
+                width: 100%;
+
+                box-sizing: border-box;
+
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<main class="card">
+
+
+    <div class="icon">
+        ≡
+    </div>
+
+
+    <div class="eyebrow">
+        Resource Switcher
+    </div>
+
+
+    <h1>
+        Having trouble with speed?
+    </h1>
+
+
+    <p>
+        If this page feels slow or takes a while to
+        load on your end, there's another way you can
+        try accessing the project.
+    </p>
+
+
+    <div class="suggestion">
+
+        <strong>
+            Try the jsDelivr CDN version
+        </strong>
+
+        <p>
+            jsDelivr can provide a CDN-hosted copy of
+            the project. Depending on your location and
+            connection, this may load differently from
+            the normal version.
+        </p>
+
+
+        <a
+            class="button"
+            href="https://cdn.jsdelivr.net/gh/unblockedgamesbruh/iframe-switcher/"
+            target="_blank"
+            rel="noopener noreferrer">
+
+            Open jsDelivr Version
+
+        </a>
+
+
+        <code class="url">
+            https://cdn.jsdelivr.net/gh/unblockedgamesbruh/iframe-switcher/
+        </code>
+
+    </div>
+
+
+    <p class="note">
+        This is simply an alternative access point.
+        Your connection, location, browser, and network
+        conditions can all affect loading speed.
+    </p>
+
+
+</main>
+
+
+</body>
+
+</html>
